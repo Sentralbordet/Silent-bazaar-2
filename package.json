@@ -8,10 +8,9 @@
   "version": "1.0.0",
   "description": "",
   "main": "ai-bot-2.js",
-  "scripts": {
-    "test": "echo \"Error: no test specified\" && exit 1"
-  },
-  "repository": {
+"scripts": {
+  "start": "node bazaar.js"
+}  "repository": {
     "type": "git",
     "url": "git+https://github.com/Sentralbordet/Silent-bazaar-2.git"
   },
