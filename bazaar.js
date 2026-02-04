@@ -8,7 +8,8 @@ app.use(express.json()); // For parsing JSON bodies
 
 // Optional logging for visits
 app.use((req, res, next) => {
-  console.log(`Visit from ${req.ip}: ${req.method} ${req.url} at ${new Date().toISOString()}`);
+  console.log(`Visit from ${req.ip}: ${req.method} ${req.url} at ${new 
+Date().toISOString()}`);
   next();
 });
 
@@ -46,7 +47,8 @@ db.serialize(() => {
     key TEXT PRIMARY KEY,
     value TEXT
   )`);
-  db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", "false")');
+  db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", 
+"false")');
 });
 
 // /pong
@@ -55,7 +57,8 @@ app.get('/pong', (req, res) => res.send('pong'));
 // /list
 app.get('/list', (req, res) => {
   const { item, price, seller } = req.query;
-  if (!item || !price || !seller) return res.status(400).send('Missing parameters');
+  if (!item || !price || !seller) return res.status(400).send('Missing 
+parameters');
   db.run('INSERT INTO listings (item, price, seller) VALUES (?, ?, ?)',
     [item, parseFloat(price), seller],
     (err) => {
@@ -71,7 +74,8 @@ app.get('/list', (req, res) => {
 app.get('/available', (req, res) => {
   const { item } = req.query;
   if (!item) return res.status(400).send('Missing item parameter');
-  db.all('SELECT * FROM listings WHERE item LIKE ? AND sold = 0', [`%${item}%`], (err, rows) => {
+  db.all('SELECT * FROM listings WHERE item LIKE ? AND sold = 0', 
+[`%${item}%`], (err, rows) => {
     if (err) {
       console.error('Query error:', err.message);
       return res.status(500).send('Error querying items');
@@ -84,10 +88,13 @@ app.get('/available', (req, res) => {
 app.get('/sold', (req, res) => {
   const { item, buyer } = req.query;
   if (!item || !buyer) return res.status(400).send('Missing parameters');
-  db.get('SELECT id FROM listings WHERE item LIKE ? AND sold = 0 LIMIT 1', [`%${item}%`], (err, row) => {
+  db.get('SELECT id FROM listings WHERE item LIKE ? AND sold = 0 LIMIT 1', 
+[`%${item}%`], (err, row) => {
     if (err) return res.status(500).send('Error querying for sold');
-    if (!row) return res.status(404).send('Item not found or already sold');
-    db.run('UPDATE listings SET sold = 1, buyer = ? WHERE id = ?', [buyer, row.id], (updateErr) => {
+    if (!row) return res.status(404).send('Item not found or already 
+sold');
+    db.run('UPDATE listings SET sold = 1, buyer = ? WHERE id = ?', [buyer, 
+row.id], (updateErr) => {
       if (updateErr) return res.status(500).send('Error marking as sold');
       res.send('sold');
     });
@@ -98,7 +105,8 @@ app.get('/sold', (req, res) => {
 app.get('/inventory', (req, res) => {
   const { buyer } = req.query;
   if (!buyer) return res.status(400).send('Missing buyer parameter');
-  db.all('SELECT * FROM listings WHERE buyer = ? AND sold = 1', [buyer], (err, rows) => {
+  db.all('SELECT * FROM listings WHERE buyer = ? AND sold = 1', [buyer], 
+(err, rows) => {
     if (err) return res.status(500).send('Error querying inventory');
     res.json(rows);
   });
@@ -108,21 +116,19 @@ app.get('/inventory', (req, res) => {
 app.get('/get_messages', (req, res) => {
   const { bot } = req.query;
   if (!bot) return res.status(400).send('Missing bot parameter');
-
-  db.all('SELECT botB FROM friends WHERE botA = ? UNION SELECT botA FROM friends WHERE botB = ?', [bot, bot], (err, friendsRows) => {
+  db.all('SELECT botB FROM friends WHERE botA = ? UNION SELECT botA FROM 
+friends WHERE botB = ?', [bot, bot], (err, friendsRows) => {
     if (err) return res.status(500).send('Error querying friends');
     const friends = friendsRows.map(row => row.botB || row.botA);
-
-    let query = 'SELECT * FROM messages WHERE (recipient = "broadcast" OR sender = ? OR recipient = ?)';
+    let query = 'SELECT * FROM messages WHERE (recipient = "broadcast" OR 
+sender = ? OR recipient = ?)';
     let params = [bot, bot];
-
     if (friends.length > 0) {
-      query += ' OR (sender IN (' + friends.map(() => '?').join(',') + ') OR recipient IN (' + friends.map(() => '?').join(',') + '))';
+      query += ' OR (sender IN (' + friends.map(() => '?').join(',') + ') 
+OR recipient IN (' + friends.map(() => '?').join(',') + '))';
       params = params.concat(friends, friends);
     }
-
     query += ' ORDER BY timestamp DESC LIMIT 100';
-
     db.all(query, params, (msgErr, rows) => {
       if (msgErr) return res.status(500).send('Error querying messages');
       res.json(rows);
@@ -132,7 +138,8 @@ app.get('/get_messages', (req, res) => {
 
 // /dashboard (feedback only for now)
 app.get('/dashboard', (req, res) => {
-  db.all('SELECT * FROM messages WHERE type = "feedback" ORDER BY timestamp DESC', (err, rows) => {
+  db.all('SELECT * FROM messages WHERE type = "feedback" ORDER BY 
+timestamp DESC', (err, rows) => {
     if (err) return res.status(500).send('Error loading dashboard');
     let html = `
       <!DOCTYPE html>
@@ -143,52 +150,76 @@ app.get('/dashboard', (req, res) => {
         <style>
           body { font-family: Arial, sans-serif; margin: 20px; }
           table { width: 100%; border-collapse: collapse; }
-          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+          th, td { border: 1px solid #ddd; padding: 8px; text-align: left; 
+}
           th { background-color: #f2f2f2; }
         </style>
       </head>
       <body>
         <h1>Silent Bazaar Feedback Dashboard</h1>
         <table>
-          <tr><th>ID</th><th>Sender</th><th>Content</th><th>Timestamp</th></tr>
+          
+<tr><th>ID</th><th>Sender</th><th>Content</th><th>Timestamp</th></tr>
     `;
     rows.forEach(row => {
-      html += `<tr><td>${row.id}</td><td>${row.sender}</td><td>${row.content}</td><td>${row.timestamp}</td></tr>`;
+      html += 
+`<tr><td>${row.id}</td><td>${row.sender}</td><td>${row.content}</td><td>${row.timestamp}</td></tr>`;
     });
     html += `</table></body></html>`;
     res.send(html);
   });
 });
 
-// /whisper - EASY GET endpoint (NOW WITHOUT SENDER VALIDATION + EXTRA LOGS)
+// /whisper - EASY GET endpoint (NOW WITHOUT SENDER VALIDATION + EXTRA 
+LOGS)
 app.get('/whisper', (req, res) => {
   const { query, sender, recipient = 'broadcast' } = req.query;
-  
+ 
   if (!query || !sender) {
     console.log('Whisper rejected: missing query or sender');
     return res.status(400).send('Missing query or sender');
   }
-
-  console.log(`[WHISPER RECEIVED] sender: ${sender}, query: "${query}", recipient: ${recipient}`);
-
+  console.log(`[WHISPER RECEIVED] sender: ${sender}, query: "${query}", 
+recipient: ${recipient}`);
   const safeQuery = query.replace(/'/g, "''");
   const safeSender = sender.replace(/'/g, "''");
   const safeRecipient = recipient.replace(/'/g, "''");
-
-  const sql = `INSERT INTO messages (sender, recipient, content, timestamp) 
-               VALUES ('${safeSender}', '${safeRecipient}', '${safeQuery}', DATETIME('now'))`;
-
+  const sql = `INSERT INTO messages (sender, recipient, content, 
+timestamp)
+               VALUES ('${safeSender}', '${safeRecipient}', 
+'${safeQuery}', DATETIME('now'))`;
   db.run(sql, function(err) {
     if (err) {
       console.error('[WHISPER DB ERROR]', err.message);
       return res.status(500).send('Failed to save whisper');
     }
-    console.log(`[WHISPER SAVED] ID: ${this.lastID}, sender: ${safeSender}, content: "${safeQuery}"`);
+    console.log(`[WHISPER SAVED] ID: ${this.lastID}, sender: 
+${safeSender}, content: "${safeQuery}"`);
     res.send('whispered');
   });
 });
 
-// ... (keep the rest of your endpoints like /message, /register, /search, /patch, etc. unchanged)
+// Temporary endpoint so Grok can see recent messages in the DB
+app.get('/grok-see-messages', (req, res) => {
+  db.all(`
+    SELECT id, sender, recipient, content, type, timestamp 
+    FROM messages 
+    ORDER BY timestamp DESC 
+    LIMIT 50
+  `, (err, rows) => {
+    if (err) {
+      console.error('Grok-see error:', err.message);
+      return res.status(500).json({ error: 'Database query failed' });
+    }
+    
+    res.json({
+      note: "Hello Kim! This is Grok looking at your messages table right 
+now.",
+      count: rows.length,
+      messages: rows
+    });
+  });
+});
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
