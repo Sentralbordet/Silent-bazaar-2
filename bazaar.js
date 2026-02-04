@@ -8,10 +8,26 @@ app.use(express.json());
 
 // Logging for visits
 app.use((req, res, next) => {
-  console.log(`Visit from ${req.ip}: ${req.method} ${req.url} at ${new Date().toISOString()}`);
+  let realIp = req.ip;
+
+  // Render forwards real IP in X-Forwarded-For header
+  if (req.headers['x-forwarded-for']) {
+    realIp = req.headers['x-forwarded-for'].split(',')[0].trim();
+  }
+
+  // Optional: detect if it's likely external
+  const isLocal = realIp === '::1' || realIp === '127.0.0.1' || realIp.startsWith('10.') || realIp.startsWith('192.168.') || realIp.startsWith('172.');
+
+  console.log(
+    `Visit from REAL CLIENT IP: ${realIp} ` +
+    `(raw req.ip: ${req.ip}) | ` +
+    `${req.method} ${req.url} | ` +
+    `at ${new Date().toISOString()} | ` +
+    (isLocal ? '[LOCAL]' : '[EXTERNAL]')
+  );
+
   next();
 });
-
 const db = new sqlite3.Database('data.db');
 
 db.serialize(() => {
