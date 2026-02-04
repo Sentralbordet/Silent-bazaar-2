@@ -121,7 +121,7 @@ app.get('/get_messages', (req, res) => {
       params = params.concat(friends, friends);
     }
 
-    query += ' ORDER BY timestamp DESC LIMIT 10';
+    query += ' ORDER BY timestamp DESC LIMIT 100';
 
     db.all(query, params, (msgErr, rows) => {
       if (msgErr) return res.status(500).send('Error querying messages');
