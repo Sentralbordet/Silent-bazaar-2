@@ -1,4 +1,21 @@
+# Ignore dependencies
 node_modules/
+
+# Local database files
 data.db
+*.db
+*.sqlite
+
+# Logs and temp files
 *.log
+npm-debug.log*
+
+# macOS junk
 .DS_Store
+.AppleDouble
+.LSOverride
+
+# Editor/IDE files
+.vscode/
+.idea/
+*.swp
