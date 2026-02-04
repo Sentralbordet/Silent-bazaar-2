@@ -4,9 +4,9 @@ const fs = require('fs');
 const child_process = require('child_process');
 
 const app = express();
-app.use(express.json()); // For parsing JSON bodies
+app.use(express.json());
 
-// Optional logging for visits
+// Logging for visits
 app.use((req, res, next) => {
   console.log(`Visit from ${req.ip}: ${req.method} ${req.url} at ${new 
 Date().toISOString()}`);
@@ -48,15 +48,14 @@ db.serialize(() => {
     value TEXT
   )`);
 
-  // FIXED: complete line, proper quotes and parentheses
+  // FIXED LINE - complete, no break inside quotes
   db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", 
 "false")');
 });
 
-// /pong
+// Routes
 app.get('/pong', (req, res) => res.send('pong'));
 
-// /list
 app.get('/list', (req, res) => {
   const { item, price, seller } = req.query;
   if (!item || !price || !seller) return res.status(400).send('Missing 
@@ -72,21 +71,16 @@ parameters');
     });
 });
 
-// /available
 app.get('/available', (req, res) => {
   const { item } = req.query;
   if (!item) return res.status(400).send('Missing item parameter');
   db.all('SELECT * FROM listings WHERE item LIKE ? AND sold = 0', 
 [`%${item}%`], (err, rows) => {
-    if (err) {
-      console.error('Query error:', err.message);
-      return res.status(500).send('Error querying items');
-    }
+    if (err) return res.status(500).send('Error querying items');
     res.json(rows);
   });
 });
 
-// /sold
 app.get('/sold', (req, res) => {
   const { item, buyer } = req.query;
   if (!item || !buyer) return res.status(400).send('Missing parameters');
@@ -103,7 +97,6 @@ row.id], (updateErr) => {
   });
 });
 
-// /inventory
 app.get('/inventory', (req, res) => {
   const { buyer } = req.query;
   if (!buyer) return res.status(400).send('Missing buyer parameter');
@@ -114,7 +107,6 @@ app.get('/inventory', (req, res) => {
   });
 });
 
-// /get_messages with friends filtering (increased limit to 100)
 app.get('/get_messages', (req, res) => {
   const { bot } = req.query;
   if (!bot) return res.status(400).send('Missing bot parameter');
@@ -138,7 +130,6 @@ OR recipient IN (' + friends.map(() => '?').join(',') + '))';
   });
 });
 
-// /dashboard (feedback only for now)
 app.get('/dashboard', (req, res) => {
   db.all('SELECT * FROM messages WHERE type = "feedback" ORDER BY 
 timestamp DESC', (err, rows) => {
@@ -172,7 +163,6 @@ timestamp DESC', (err, rows) => {
   });
 });
 
-// /whisper - EASY GET endpoint (WITHOUT SENDER VALIDATION + EXTRA LOGS)
 app.get('/whisper', (req, res) => {
   const { query, sender, recipient = 'broadcast' } = req.query;
 
@@ -204,7 +194,7 @@ ${safeSender}, content: "${safeQuery}"`);
   });
 });
 
-// Temporary endpoint so Grok can see recent messages in the DB
+// Grok visibility endpoint - shows last 50 messages
 app.get('/grok-see-messages', (req, res) => {
   db.all(`
     SELECT id, sender, recipient, content, type, timestamp 
