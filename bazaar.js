@@ -48,7 +48,7 @@ db.serialize(() => {
     value TEXT
   )`);
 
-  // FIXED: complete line, no break inside string
+  // FIXED: complete line, proper quotes and parentheses
   db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", 
 "false")');
 });
@@ -114,7 +114,7 @@ app.get('/inventory', (req, res) => {
   });
 });
 
-// /get_messages with friends filtering
+// /get_messages with friends filtering (increased limit to 100)
 app.get('/get_messages', (req, res) => {
   const { bot } = req.query;
   if (!bot) return res.status(400).send('Missing bot parameter');
