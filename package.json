@@ -1,10 +1,13 @@
 {
-  "name": "silent-bazaar",
+  "name": "silent-bazaar-2",
   "version": "1.0.0",
-  "description": "Silent Bazaar project - a local Node.js server for AI bots",
   "main": "bazaar.js",
   "scripts": {
     "start": "node bazaar.js"
+  },
+  "dependencies": {
+    "express": "^4.18.2",
+    "sqlite3": "^5.1.6"
   },
   "dependencies": {
     "express": "^4.18.2",
