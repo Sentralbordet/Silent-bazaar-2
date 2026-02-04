@@ -41,7 +41,8 @@ if (!query || !sender) return res.status(400).send('Missing query or sender');
   const safeR = recipient.replace(/'/g, "''");
   const sql = `INSERT INTO messages (sender, recipient, content, 
 timestamp) VALUES ('${safeS}', '${safeR}', '${safeQ}', DATETIME('now'))`;
-  db.run(sql, function(err) {
+console.log(`[DB INSERT SQL] ${sql}`);  
+db.run(sql, function(err) {
     if (err) {
       console.error('[WHISPER DB ERROR]', err);
       return res.status(500).send('Failed');
