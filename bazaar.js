@@ -48,7 +48,7 @@ db.serialize(() => {
     value TEXT
   )`);
 
-  // FIXED: complete string, no line break inside quotes
+  // FIXED: complete line, no break inside string
   db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", 
 "false")');
 });
