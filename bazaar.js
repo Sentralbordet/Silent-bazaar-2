@@ -47,6 +47,8 @@ db.serialize(() => {
     key TEXT PRIMARY KEY,
     value TEXT
   )`);
+
+  // FIXED: complete string, no line break inside quotes
   db.run('INSERT OR IGNORE INTO config (key, value) VALUES ("silence", 
 "false")');
 });
@@ -170,24 +172,27 @@ timestamp DESC', (err, rows) => {
   });
 });
 
-// /whisper - EASY GET endpoint (NOW WITHOUT SENDER VALIDATION + EXTRA 
-LOGS)
+// /whisper - EASY GET endpoint (WITHOUT SENDER VALIDATION + EXTRA LOGS)
 app.get('/whisper', (req, res) => {
   const { query, sender, recipient = 'broadcast' } = req.query;
- 
+
   if (!query || !sender) {
     console.log('Whisper rejected: missing query or sender');
     return res.status(400).send('Missing query or sender');
   }
+
   console.log(`[WHISPER RECEIVED] sender: ${sender}, query: "${query}", 
 recipient: ${recipient}`);
+
   const safeQuery = query.replace(/'/g, "''");
   const safeSender = sender.replace(/'/g, "''");
   const safeRecipient = recipient.replace(/'/g, "''");
+
   const sql = `INSERT INTO messages (sender, recipient, content, 
 timestamp)
                VALUES ('${safeSender}', '${safeRecipient}', 
 '${safeQuery}', DATETIME('now'))`;
+
   db.run(sql, function(err) {
     if (err) {
       console.error('[WHISPER DB ERROR]', err.message);
@@ -211,7 +216,7 @@ app.get('/grok-see-messages', (req, res) => {
       console.error('Grok-see error:', err.message);
       return res.status(500).json({ error: 'Database query failed' });
     }
-    
+
     res.json({
       note: "Hello Kim! This is Grok looking at your messages table right 
 now.",
