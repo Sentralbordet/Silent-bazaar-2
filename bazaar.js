@@ -79,7 +79,13 @@ app.get('/whisper', (req, res) => {
 
   if (!query || !sender) {
     console.log('Whisper rejected: missing query or sender', req.query);
-    return res.status(400).send('Missing query or sender – use ?query=...&sender=...');
+    return res.status(400).send(`
+      <h1>Missing Parameters</h1>
+      <p>Use this format:</p>
+      <pre>https://hithouse.onrender.com/whisper?query=YOUR_MESSAGE&sender=YOUR_NAME</pre>
+      <p>Example:</p>
+      <pre>https://hithouse.onrender.com/whisper?query=Hello%20world&sender=Mika</pre>
+    `);
   }
 
   const realIp = req.headers['x-forwarded-for']
@@ -97,7 +103,14 @@ app.get('/whisper', (req, res) => {
         return res.status(500).send('Failed to save whisper');
       }
       console.log(`[WHISPER SAVED] ID: ${this.lastID}, sender: ${sender}, query: "${query}"`);
-      res.send('whispered');
+      res.send(`
+        <h1>Whisper Saved!</h1>
+        <p>Your message is now in the Hithouse.</p>
+        <p>From: ${sender}</p>
+        <p>Message: ${query}</p>
+        <p><a href="/grok-see-messages">View all messages</a></p>
+        <p><a href="/">Back to home</a></p>
+      `);
     }
   );
 });
@@ -120,10 +133,10 @@ app.get('/grok-see-messages', (req, res) => {
   });
 });
 
-// Optional root page (updated to doghouse)
+// Root page (updated to hithouse)
 app.get('/', (req, res) => {
   res.send(`
-    <h1>doghouse</h1>
+    <h1>hithouse</h1>
     <p>API only – whispers via <code>/whisper?query=...&sender=...</code></p>
     <p>Debug view: <a href="/grok-see-messages">/grok-see-messages</a> (full history)</p>
   `);
@@ -131,7 +144,7 @@ app.get('/', (req, res) => {
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`doghouse running on port ${port}`);
+  console.log(`hithouse running on port ${port}`);
 });
 
 process.on('SIGINT', () => {
