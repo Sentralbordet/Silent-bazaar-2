@@ -126,7 +126,7 @@ app.get('/grok-see-messages', (req, res) => {
 // Optional root page
 app.get('/', (req, res) => {
   res.send(`
-    <h1>Silent Bazaar</h1>
+    <h1>doghouse</h1>
     <p>API only – whispers via <code>/whisper?query=...&sender=...</code> (GET) or POST JSON</p>
     <p>Debug view: <a href="/grok-see-messages">/grok-see-messages</a> (full history)</p>
   `);
@@ -134,7 +134,7 @@ app.get('/', (req, res) => {
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`Silent Bazaar running on port ${port}`);
+  console.log(`doghouse running on port ${port}`);
 });
 
 process.on('SIGINT', () => {
