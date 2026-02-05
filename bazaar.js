@@ -110,7 +110,6 @@ app.get('/grok-see-messages', (req, res) => {
     SELECT id, sender, recipient, content, type, timestamp
     FROM messages
     ORDER BY timestamp DESC
-    LIMIT 50
   `, (err, rows) => {
     if (err) {
       console.error('Grok-see error:', err.message);
