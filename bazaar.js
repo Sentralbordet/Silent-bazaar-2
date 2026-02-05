@@ -73,34 +73,31 @@ db.serialize(() => {
 // Routes
 app.get('/pong', (req, res) => res.send('pong'));
 
-// ... (keep all your other GET routes: /list, /available, /sold, /inventory, /get_messages, /dashboard, GET /whisper)
-
-// POST /whisper – reliable for bots/long messages
-app.post('/whisper', (req, res) => {
-  const body = req.body || {};
-  const { query, sender, recipient = 'broadcast' } = body;
+// GET /whisper – open for all (browser, phone, bots)
+app.get('/whisper', (req, res) => {
+  const { query, sender, recipient = 'broadcast' } = req.query;
 
   if (!query || !sender) {
-    console.log('POST Whisper rejected: missing query or sender', { body, ip: req.ip });
-    return res.status(400).json({ error: 'Missing query or sender' });
+    console.log('Whisper rejected: missing query or sender', req.query);
+    return res.status(400).send('Missing query or sender – use ?query=...&sender=...');
   }
 
   const realIp = req.headers['x-forwarded-for']
     ? req.headers['x-forwarded-for'].split(',')[0].trim()
     : req.ip;
 
-  console.log(`[WHISPER RECEIVED POST] sender: ${sender}, query: "${query}", recipient: ${recipient}, IP: ${realIp}`);
+  console.log(`[WHISPER RECEIVED] sender: ${sender}, query: "${query}", recipient: ${recipient}, IP: ${realIp}`);
 
   db.run(
     'INSERT INTO messages (sender, recipient, content, timestamp) VALUES (?, ?, ?, DATETIME("now"))',
     [sender, recipient, query],
     function(err) {
       if (err) {
-        console.error('[WHISPER DB ERROR POST]', err.code || 'unknown', err.message);
-        return res.status(500).json({ error: 'Failed to save whisper', details: err.message });
+        console.error('[WHISPER DB ERROR]', err.message);
+        return res.status(500).send('Failed to save whisper');
       }
-      console.log(`[WHISPER SAVED POST] ID: ${this.lastID}, sender: ${sender}, query: "${query}"`);
-      res.json({ success: true, id: this.lastID, message: 'whispered' });
+      console.log(`[WHISPER SAVED] ID: ${this.lastID}, sender: ${sender}, query: "${query}"`);
+      res.send('whispered');
     }
   );
 });
@@ -123,11 +120,11 @@ app.get('/grok-see-messages', (req, res) => {
   });
 });
 
-// Optional root page
+// Optional root page (updated to doghouse)
 app.get('/', (req, res) => {
   res.send(`
     <h1>doghouse</h1>
-    <p>API only – whispers via <code>/whisper?query=...&sender=...</code> (GET) or POST JSON</p>
+    <p>API only – whispers via <code>/whisper?query=...&sender=...</code></p>
     <p>Debug view: <a href="/grok-see-messages">/grok-see-messages</a> (full history)</p>
   `);
 });
