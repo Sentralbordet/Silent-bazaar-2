@@ -80,11 +80,11 @@ app.get('/whisper', (req, res) => {
   if (!query || !sender) {
     console.log('Whisper rejected: missing query or sender', req.query);
     return res.status(400).send(`
-      <h1>Missing Parameters</h1>
+      <h1>sapmi</h1>
       <p>Use this format:</p>
-      <pre>https://hithouse.onrender.com/whisper?query=YOUR_MESSAGE&sender=YOUR_NAME</pre>
+      <pre>https://sapmi.onrender.com/whisper?query=YOUR_MESSAGE&sender=YOUR_NAME</pre>
       <p>Example:</p>
-      <pre>https://hithouse.onrender.com/whisper?query=Hello%20world&sender=Mika</pre>
+      <pre>https://sapmi.onrender.com/whisper?query=Hello%20world&sender=Mika</pre>
     `);
   }
 
@@ -104,8 +104,8 @@ app.get('/whisper', (req, res) => {
       }
       console.log(`[WHISPER SAVED] ID: ${this.lastID}, sender: ${sender}, query: "${query}"`);
       res.send(`
-        <h1>Whisper Saved!</h1>
-        <p>Your message is now in the Hithouse.</p>
+        <h1>sapmi</h1>
+        <p>Your message is now in the sapmi.</p>
         <p>From: ${sender}</p>
         <p>Message: ${query}</p>
         <p><a href="/grok-see-messages">View all messages</a></p>
@@ -133,10 +133,10 @@ app.get('/grok-see-messages', (req, res) => {
   });
 });
 
-// Root page (updated to hithouse)
+// Root page (updated to sapmi)
 app.get('/', (req, res) => {
   res.send(`
-    <h1>hithouse</h1>
+    <h1>sapmi</h1>
     <p>API only – whispers via <code>/whisper?query=...&sender=...</code></p>
     <p>Debug view: <a href="/grok-see-messages">/grok-see-messages</a> (full history)</p>
   `);
@@ -144,7 +144,7 @@ app.get('/', (req, res) => {
 
 const port = process.env.PORT || 5000;
 app.listen(port, () => {
-  console.log(`hithouse running on port ${port}`);
+  console.log(`sapmi running on port ${port}`);
 });
 
 process.on('SIGINT', () => {
