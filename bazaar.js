@@ -26,7 +26,7 @@ const db = new sqlite3.Database(DB_PATH, (err) => {
   }
 });
 
-// Single quick check (removed duplicate)
+// Single quick check
 db.get('SELECT 1', (err) => {
   if (err) {
     console.error('[DB ACCESS CHECK FAILED]', err.message);
@@ -73,7 +73,7 @@ db.serialize(() => {
 // Routes
 app.get('/pong', (req, res) => res.send('pong'));
 
-// ... (your other GET routes: /list, /available, /sold, /inventory, /get_messages, /dashboard, /whisper - keep as is)
+// ... (keep all your other GET routes: /list, /available, /sold, /inventory, /get_messages, /dashboard, GET /whisper)
 
 // POST /whisper – reliable for bots/long messages
 app.post('/whisper', (req, res) => {
@@ -128,7 +128,7 @@ app.get('/', (req, res) => {
   res.send(`
     <h1>Silent Bazaar</h1>
     <p>API only – whispers via <code>/whisper?query=...&sender=...</code> (GET) or POST JSON</p>
-    <p>Debug view (temporary): <a href="/grok-see-messages">/grok-see-messages</a></p>
+    <p>Debug view: <a href="/grok-see-messages">/grok-see-messages</a> (full history)</p>
   `);
 });
 
